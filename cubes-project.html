@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cubes — Joy Zhang</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300;1,9..40,400&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --font-sans: "DM Sans", "Helvetica Neue", Arial, sans-serif;
+      --font-display: "Space Grotesk", "Helvetica Neue", Arial, sans-serif;
+      --bg: #ffffff;
+      --fg: #111111;
+      --muted: #5f5a52;
+      --line: #e5dfd4;
+      --panel: #f7f7f7;
+      --panel2: #efefef;
+      --accent: #fb5607;
+      --shadow: 0 18px 40px rgba(17, 17, 17, .12);
+      --radius: 12px;
+      --radius-lg: 16px;
+      --container: 920px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; }
+
+    body {
+      font-family: var(--font-sans);
+      background: var(--bg);
+      color: var(--fg);
+      font-size: 17px;
+      line-height: 1.6;
+      letter-spacing: 0.1px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--line);
+      padding: 0 32px;
+      height: 52px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .nav-logo {
+      font-family: var(--font-display);
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--fg);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .nav-logo::before {
+      content: '';
+      display: inline-block;
+      width: 7px;
+      height: 7px;
+      background: var(--accent);
+      border-radius: 50%;
+      animation: dotPulse 2s infinite;
+    }
+
+    @keyframes dotPulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    .nav-links { display: flex; align-items: center; gap: 28px; list-style: none; }
+    .nav-links a { font-size: 14px; color: var(--muted); text-decoration: none; transition: color 0.2s; }
+    .nav-links a:hover { color: var(--accent); }
+
+    main {
+      max-width: var(--container);
+      margin: 0 auto;
+      padding: 48px 24px 96px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .card { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 36px 40px; }
+    .hero { padding: 40px 40px 36px; }
+
+    .breadcrumb { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+    .breadcrumb-left { display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--muted); }
+    .breadcrumb-left a { color: var(--muted); text-decoration: none; transition: color 0.2s; }
+    .breadcrumb-left a:hover { color: var(--accent); }
+    .breadcrumb-right { font-size: 13px; color: var(--muted); }
+
+    .hero h1 { font-family: var(--font-display); font-size: clamp(28px, 4vw, 42px); font-weight: 600; letter-spacing: -0.5px; line-height: 1.2; margin-bottom: 14px; }
+    .hero-desc { font-size: 16px; color: var(--muted); max-width: 600px; line-height: 1.65; margin-bottom: 28px; }
+
+    .hero-meta {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      padding-top: 24px;
+      border-top: 1px solid var(--line);
+      margin-bottom: 20px;
+    }
+
+    .meta-label { font-size: 11px; font-weight: 500; color: var(--accent); text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 4px; }
+    .meta-value { font-family: var(--font-display); font-size: 14px; font-weight: 500; color: var(--fg); }
+
+    .section-label { font-family: var(--font-display); font-size: 13px; font-weight: 500; color: var(--accent); letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 20px; }
+    .body-text { font-size: 16px; color: var(--muted); line-height: 1.7; }
+
+    .inner-card { background: var(--bg); border: 1px solid var(--line); border-radius: var(--radius); padding: 24px 28px; }
+    .inner-card h3 { font-family: var(--font-display); font-size: 14px; font-weight: 600; margin-bottom: 10px; }
+    .inner-card p { font-size: 15px; color: var(--muted); line-height: 1.65; }
+
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 20px; }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-top: 20px; }
+
+    .try-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--accent);
+      color: white;
+      font-family: var(--font-display);
+      font-size: 14px;
+      font-weight: 600;
+      padding: 12px 24px;
+      border-radius: var(--radius);
+      text-decoration: none;
+      transition: opacity 0.2s;
+    }
+
+    .try-btn:hover { opacity: 0.85; }
+
+    .img-placeholder { background: var(--panel2); border: 1px solid var(--line); border-radius: var(--radius); aspect-ratio: 16/9; display: flex; align-items: center; justify-content: center; margin-top: 20px; }
+    .img-placeholder span { font-size: 13px; color: var(--muted); }
+
+    .tag { font-size: 13px; color: var(--muted); background: var(--panel2); border: 1px solid var(--line); border-radius: 100px; padding: 4px 12px; }
+
+    footer { max-width: var(--container); margin: 0 auto; padding: 24px 24px 48px; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--line); }
+    footer p { font-size: 13px; color: var(--muted); }
+    footer a { font-size: 13px; color: var(--accent); text-decoration: none; }
+
+    @media (max-width: 640px) {
+      .card, .hero { padding: 28px 24px; }
+      .hero-meta { grid-template-columns: 1fr 1fr; }
+      .grid-2, .grid-3 { grid-template-columns: 1fr; }
+      nav { padding: 0 20px; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <a class="nav-logo" href="index.html">Joy Zhang</a>
+    <ul class="nav-links">
+      <li><a href="index.html#work">Work</a></li>
+      <li><a href="vibecoding.html">Vibe Coding</a></li>
+      <li><a href="https://www.linkedin.com/in/joy-z-15604823b/" target="_blank">Contact</a></li>
+    </ul>
+  </nav>
+
+  <main>
+
+    <!-- HERO -->
+    <div class="card hero">
+      <div class="breadcrumb">
+        <div class="breadcrumb-left">
+          <a href="vibecoding.html">← Back</a>
+          <span>/</span>
+          <span>Project 02</span>
+        </div>
+        <div class="breadcrumb-right">Python · AI · GSAP</div>
+      </div>
+
+      <h1>Cubes — Personalized<br>Daily Design Feed</h1>
+      <p class="hero-desc">An AI-powered design intelligence feed. RSS scraping, daily digest generation, and an animated cube grid frontend — built to keep up with the design world on my own terms.</p>
+
+      <div class="hero-meta">
+        <div>
+          <p class="meta-label">Built with</p>
+          <p class="meta-value">Python · GSAP · Claude API</p>
+        </div>
+        <div>
+          <p class="meta-label">Type</p>
+          <p class="meta-value">Side Project</p>
+        </div>
+        <div>
+          <p class="meta-label">Why</p>
+          <p class="meta-value">For fun, late at night</p>
+        </div>
+      </div>
+
+      <a class="try-btn" href="cubes.html" target="_blank">Try it ↗</a>
+    </div>
+
+    <!-- ABOUT -->
+    <div class="card">
+      <p class="section-label">About</p>
+      <div class="grid-3">
+        <div class="inner-card">
+          <h3>The Problem</h3>
+          <p>Design feeds are noisy. I wanted a digest that was curated, summarized by AI, and delivered in a format I actually wanted to look at.</p>
+        </div>
+        <div class="inner-card">
+          <h3>The System</h3>
+          <p>Two Python scripts — one scrapes RSS feeds, one calls Claude to generate a daily report. The output feeds into a custom HTML frontend.</p>
+        </div>
+        <div class="inner-card">
+          <h3>The Frontend</h3>
+          <p>An animated GSAP cube grid titled "cube for your thoughts, joy" — because the interface should be as interesting as the content.</p>
+        </div>
+      </div>
+      <div style="border-radius: var(--radius); overflow: hidden; border: 1px solid var(--line); margin-top: 20px;">
+        <video src="https://res.cloudinary.com/dmvnnlzyj/video/upload/v1775356737/cubes_we0pif.mp4" muted loop playsinline autoplay preload="auto" style="width:100%;display:block;"></video>
+      </div>
+    </div>
+
+  </main>
+
+  <footer>
+    <p>Joy Zhang · Product Designer · Toronto</p>
+    <a href="https://www.linkedin.com/in/joy-z-15604823b/" target="_blank">LinkedIn</a>
+  </footer>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('video').forEach(v => v.play().catch(() => {}));
+    });
+    document.querySelectorAll('video').forEach(v => v.play().catch(() => {}));
+  </script>
+</body>
+</html>

@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Women of Science Fiction · 女性科幻作家图鉴</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:#0d1117; overflow:hidden; height:100vh; font-family:Georgia,serif; color:#e8e0f0; }
+#app { display:flex; flex-direction:column; height:100vh; }
+#header { text-align:center; padding:18px 20px 12px; border-bottom:1px solid rgba(180,150,220,0.08); flex-shrink:0; }
+.header-sub { font-size:8px; letter-spacing:6px; color:rgba(180,150,220,0.28); margin-bottom:7px; text-transform:uppercase; font-family:monospace; }
+.header-title { font-size:clamp(17px,2.8vw,26px); color:#e8e0f8; line-height:1.2; font-weight:400; }
+.header-zh { font-size:8px; letter-spacing:3px; color:rgba(180,150,220,0.2); margin-top:6px; text-transform:uppercase; font-family:monospace; }
+#globe-area { flex:1; position:relative; overflow:hidden; }
+#starfield { position:absolute; inset:0; width:100%; height:100%; pointer-events:none; }
+#mount { position:absolute; inset:0; }
+#status { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; pointer-events:none; }
+#status span { font-size:9px; letter-spacing:3px; color:rgba(180,150,220,0.5); font-family:monospace; text-transform:uppercase; animation:drift 2s ease-in-out infinite; }
+#footer { text-align:center; font-size:8px; letter-spacing:2px; color:rgba(180,150,220,0.13); padding:7px 0 9px; font-family:monospace; text-transform:uppercase; flex-shrink:0; }
+
+/* Panel 优化：增加毛玻璃与通透感 */
+#panel { 
+  position:absolute; right:0; top:0; bottom:0; width:300px; 
+  background:rgba(6,4,18,0.88); 
+  backdrop-filter: blur(15px); 
+  -webkit-backdrop-filter: blur(15px);
+  border-left:1px solid rgba(180,150,220,0.12); 
+  overflow-y:auto; z-index:30; display:none; 
+  animation:slideIn 0.4s cubic-bezier(0.22, 1, 0.36, 1); 
+}
+#panel.open { display:block; }
+.panel-head { padding:26px 22px 0; }
+.panel-tag { font-size:8px; letter-spacing:4px; color:rgba(180,150,220,0.35); margin-bottom:10px; text-transform:uppercase; font-family:monospace; }
+.panel-name { font-size:21px; color:#e8e0f0; line-height:1.2; margin-bottom:12px; font-weight:400; letter-spacing: 0.5px; }
+.panel-tabs { display:flex; border-bottom:1px solid rgba(180,150,220,0.1); }
+.tab-btn { font-size:9px; letter-spacing:2px; font-family:monospace; text-transform:uppercase; cursor:pointer; padding:7px 0; margin-right:20px; color:rgba(180,150,220,0.3); background:none; border:none; border-bottom:1px solid transparent; margin-bottom:-1px; transition:color 0.2s; }
+.tab-btn.active { color:#d4b8f0; border-bottom-color:rgba(180,150,220,0.5); }
+.panel-body { padding:20px 22px 40px; }
+.tab-content { display:none; }
+.tab-content.active { display:block; }
+.tags { display:flex; flex-wrap:wrap; gap:5px; margin-bottom:18px; }
+.tag { font-size:9px; letter-spacing:0.8px; font-family:monospace; color:rgba(200,170,240,0.6); border:1px solid rgba(200,170,240,0.18); border-radius:2px; padding:2px 7px; background:rgba(200,170,240,0.04); }
+.bio { font-size:13px; line-height:1.85; color:rgba(220,215,235,0.68); }
+.origin { margin-top:20px; font-size:8px; letter-spacing:2px; color:rgba(180,150,220,0.2); text-transform:uppercase; font-family:monospace; }
+.tl-label { font-size:8px; letter-spacing:3px; color:rgba(180,150,220,0.3); text-transform:uppercase; font-family:monospace; margin-bottom:7px; }
+.tl-track { height:1px; background:rgba(180,150,220,0.1); position:relative; margin-bottom:6px; }
+.tl-bar { position:absolute; top:-0.5px; height:2px; background:linear-gradient(90deg,#3a1a5a,#b090e0); transition:width 0.85s cubic-bezier(0.25,0.46,0.45,0.94); }
+.tl-years { display:flex; justify-content:space-between; font-size:8px; color:rgba(180,150,220,0.22); font-family:monospace; }
+.tl-dates { font-size:15px; color:#b090e0; margin-top:6px; }
+.divider { border-top:1px solid rgba(180,150,220,0.08); margin:14px 0; }
+.works-label { font-size:8px; letter-spacing:3px; color:rgba(180,150,220,0.3); text-transform:uppercase; font-family:monospace; margin-bottom:12px; }
+.work-item { display:flex; gap:9px; margin-bottom:11px; align-items:flex-start; }
+.work-dot { width:3px; height:3px; border-radius:50%; background:#7050a0; margin-top:5px; flex-shrink:0; }
+.work-title { font-size:13px; color:#c0a8e0; line-height:1.5; }
+.work-year { font-size:9px; color:rgba(180,150,220,0.3); margin-top:1.5px; font-family:monospace; }
+.quote-block { margin-top:18px; padding:12px 14px; border-left:1.5px solid rgba(180,150,220,0.18); background:rgba(180,150,220,0.025); }
+.quote-text { font-style:italic; font-size:12px; line-height:1.85; color:rgba(210,195,235,0.55); }
+#close-btn { position:absolute; top:12px; right:12px; background:none; border:1px solid rgba(180,150,220,0.2); color:rgba(180,150,220,0.45); width:26px; height:26px; cursor:pointer; font-size:11px; display:flex; align-items:center; justify-content:center; font-family:monospace; }
+
+/* Tooltip 优化：增加磨砂质感 */
+#tooltip { position:absolute; pointer-events:none; z-index:50; display:none; transition: opacity 0.2s ease; }
+#tooltip.show { display:block; }
+.tooltip-inner { 
+  background:rgba(8, 6, 20, 0.75); 
+  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+  border:1px solid rgba(180,150,220,0.2); padding:8px 14px; 
+  box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+}
+.tooltip-name { font-size:11px; color:#e0d8f0; font-weight:400; white-space:nowrap; letter-spacing: 0.5px; }
+.tooltip-meta { font-size:8px; color:rgba(180,150,220,0.45); font-family:monospace; letter-spacing:1px; margin-top:3px; white-space:nowrap; }
+
+@keyframes slideIn { from{transform:translateX(100%);opacity:0} to{transform:translateX(0);opacity:1} }
+@keyframes drift { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-3px)} }
+@keyframes twink { 0%,100%{opacity:0.08} 50%{opacity:0.7} }
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="header">
+    <div class="header-sub">A Celestial Cartography · 文学星图</div>
+    <div class="header-title">Women of Science Fiction</div>
+    <div class="header-zh">女性科幻作家图鉴 · 1818 – Present</div>
+  </div>
+  <div id="globe-area">
+    <svg id="starfield"></svg>
+    <div id="mount"></div>
+    <div id="status"><span id="status-text">Conjuring the globe...</span></div>
+    <div id="panel">
+      <div class="panel-head">
+        <button id="close-btn">✕</button>
+        <div class="panel-tag" id="p-tag"></div>
+        <div class="panel-name" id="p-name"></div>
+        <div class="panel-tabs">
+          <button class="tab-btn active" data-tab="profile">Profile</button>
+          <button class="tab-btn" data-tab="works">Works</button>
+        </div>
+      </div>
+      <div class="panel-body">
+        <div class="tab-content active" id="tab-profile">
+          <div class="tags" id="p-tags"></div>
+          <div class="bio" id="p-bio"></div>
+          <div class="origin" id="p-origin"></div>
+        </div>
+        <div class="tab-content" id="tab-works">
+          <div class="tl-label">Timeline</div>
+          <div class="tl-track"><div class="tl-bar" id="p-bar"></div></div>
+          <div class="tl-years"><span>1800</span><span>1880</span><span>1960</span><span>2024</span></div>
+          <div class="tl-dates" id="p-dates"></div>
+          <div class="divider"></div>
+          <div class="works-label">Representative works</div>
+          <div id="p-works"></div>
+          <div class="quote-block"><div class="quote-text" id="p-quote"></div></div>
+        </div>
+      </div>
+    </div>
+    <div id="tooltip"><div class="tooltip-inner"><div class="tooltip-name" id="tt-name"></div><div class="tooltip-meta" id="tt-meta"></div></div></div>
+  </div>
+  <div id="footer">✦ drag to rotate · click a star to explore ✦</div>
+</div>
+
+<script>
+// [WRITERS 数据部分保持不变...]
+const WRITERS = {
+  shelley: { tag:"I · The Origin", nameEn:"Mary Shelley", tags:["gothic horror","proto-SF","the mother of it all"], bio:"Written at 18 during a ghost-story contest on a stormy Geneva night, Frankenstein didn't just launch a genre — it asked a question science still hasn't answered: what do we owe the beings we create?", birth:1797, death:1851, coords:[-0.12,51.5], works:[{title:"Frankenstein",year:"1818"},{title:"The Last Man",year:"1826"}], quote:"Nothing is so painful to the human mind as a great and sudden change.", origin:"England, United Kingdom" },
+  brackett: { tag:"II · The Pioneer", nameEn:"Leigh Brackett", tags:["space opera","planetary romance","Hollywood crossover"], bio:"Called the Queen of Space Opera, Brackett wrote pulp SF with the swagger of a noir detective novel. She also co-wrote the screenplay for The Empire Strikes Back — and died before she could see it on screen.", birth:1915, death:1978, coords:[-87.6,41.8], works:[{title:"The Sword of Rhiannon",year:"1953"},{title:"The Long Tomorrow",year:"1955"}], quote:"The cosmos is not required to be in harmony with human ambition.", origin:"Chicago, United States" },
+  lessing: { tag:"III · The Dissenter", nameEn:"Doris Lessing", tags:["inner space","Sufi mysticism","Nobel laureate"], bio:"Lessing came to SF sideways, through politics and disillusionment. Her Canopus in Argos series is one of the strangest, most serious bodies of SF ever written. The Nobel committee preferred her realism. She didn't care.", birth:1919, death:2013, coords:[0.5,51.5], works:[{title:"Shikasta",year:"1979"},{title:"The Memoirs of a Survivor",year:"1974"}], quote:"Whatever you're meant to do, do it now. The conditions are always impossible.", origin:"London, United Kingdom" },
+  russ: { tag:"IV · The Provocateur", nameEn:"Joanna Russ", tags:["radical feminism","metafiction","the canon's nightmare"], bio:"Russ wrote The Female Man — four versions of one woman across four parallel worlds — and then wrote How to Suppress Women's Writing, a manual for how the literary establishment erases women. She was right about all of it.", birth:1937, death:2011, coords:[-122.3,47.6], works:[{title:"The Female Man",year:"1975"},{title:"We Who Are About To...",year:"1977"}], quote:"I am not a woman. I am not a man. I am myself.", origin:"Seattle, United States" },
+  leguin: { tag:"V · The Ursula", nameEn:"Ursula K. Le Guin", tags:["anarchist utopias","gender & identity","anthropological SF"], bio:"Daughter of an anthropologist, Le Guin built alien worlds the way her father studied real ones — with rigor and empathy. She didn't write about the future; she wrote about the present in disguise.", birth:1929, death:2018, coords:[-122.6,45.5], works:[{title:"The Left Hand of Darkness",year:"1969"},{title:"The Dispossessed",year:"1974"}], quote:"The only thing that makes life possible is permanent, intolerable uncertainty.", origin:"Portland, United States" },
+  butler: { tag:"VI · The Visionary", nameEn:"Octavia E. Butler", tags:["afrofuturism","power & survival","biological horror"], bio:"Butler wrote about power because she lived its absence. A Black woman in a genre that barely acknowledged her existence, she forced SF to reckon with race, gender, and what it means to survive — on someone else's terms.", birth:1947, death:2006, coords:[-118.2,34.0], works:[{title:"Kindred",year:"1979"},{title:"Parable of the Sower",year:"1993"}], quote:"In order to rise from its own ashes, a phoenix first must burn.", origin:"California, United States" },
+  atwood: { tag:"VII · The Prophet", nameEn:"Margaret Atwood", tags:["feminist dystopia","speculative realism","near-future dread"], bio:"Atwood insists she writes speculative fiction, not science fiction — because everything in her books has already happened somewhere. That distinction is what makes The Handmaid's Tale so hard to put down.", birth:1939, death:null, coords:[-79.4,43.7], works:[{title:"The Handmaid's Tale",year:"1985"},{title:"Oryx and Crake",year:"2003"}], quote:"A rat in a maze is free to go anywhere, as long as it stays inside the maze.", origin:"Ontario, Canada" },
+  cherryh: { tag:"VIII · The Architect", nameEn:"C.J. Cherryh", tags:["hard SF","alien psychology","Hugo × multiple"], bio:"Cherryh writes aliens so alien you have to learn how to read them. Her Foreigner series — 22 novels deep — is the longest sustained study of first contact ever written, told from the view of someone who will never fully understand the species they live among.", birth:1942, death:null, coords:[-97.5,35.5], works:[{title:"Downbelow Station",year:"1981"},{title:"Cyteen",year:"1988"}], quote:"Ignorance is terrible, but not as terrible as knowing the wrong answer.", origin:"Oklahoma, United States" },
+  jemisin: { tag:"IX · The Earthquake", nameEn:"N.K. Jemisin", tags:["three Hugos in a row","geological apocalypse","second person"], bio:"Jemisin won the Hugo three consecutive years for The Broken Earth trilogy — something no one had done before. The books are narrated in second person, present tense. The world ends in the first chapter. It gets more intense from there.", birth:1972, death:null, coords:[-73.9,40.7], works:[{title:"The Fifth Season",year:"2015"},{title:"The Obelisk Gate",year:"2016"}], quote:"Let me tell you about the end of the world.", origin:"New York, United States" },
+  roanhorse: { tag:"X · The Indigenous Future", nameEn:"Rebecca Roanhorse", tags:["indigenous futurism","Navajo mythology","post-apocalyptic"], bio:"Roanhorse writes futures where Native Americans survived. Her Sixth World series begins after climate collapse and centers Diné mythology as living, practical knowledge — not folklore, but the actual operating system of a world that outlasted modernity.", birth:1971, death:null, coords:[-106.6,35.1], works:[{title:"Trail of Lightning",year:"2018"},{title:"Black Sun",year:"2020"}], quote:"The apocalypse already happened. We're still here.", origin:"New Mexico, United States" },
+  solomon: { tag:"XI · The Liminal", nameEn:"Rivers Solomon", tags:["Afro-diasporic SF","body & transformation","queer horror"], bio:"Solomon writes about bodies that don't belong anywhere. The Deep imagines the descendants of enslaved women thrown overboard during the Middle Passage evolving into water-breathing beings. It is devastating.", birth:1989, death:null, coords:[-84.4,33.7], works:[{title:"An Unkindness of Ghosts",year:"2017"},{title:"The Deep",year:"2019"}], quote:"To survive is not the same as to live.", origin:"Atlanta, United States" },
+  moreno: { tag:"XII · The Mythmaker", nameEn:"Silvia Moreno-Garcia", tags:["Mexican Gothic","retro-futurism","genre-bending"], bio:"Moreno-Garcia writes genre fiction with a scholar's eye for what genre does to history. Mexican Gothic uses the conventions of Gothic fiction to excavate colonialism, eugenics, and the violence buried under inherited wealth.", birth:1981, death:null, coords:[-99.1,19.4], works:[{title:"Mexican Gothic",year:"2020"},{title:"Gods of Jade and Shadow",year:"2019"}], quote:"The past is a house we can't stop walking through.", origin:"Mexico City, Mexico" },
+  gorodischer: { tag:"XIII · The Argentine", nameEn:"Angélica Gorodischer", tags:["political fable","Latin American SF","Le Guin's peer"], bio:"Gorodischer is the grand dame of Argentine science fiction. Her Kalpa Imperial — a series of tales from a vast fictional empire — was translated into English by Ursula K. Le Guin herself.", birth:1928, death:2022, coords:[-60.7,-32.9], works:[{title:"Kalpa Imperial",year:"1983"},{title:"Trafalgar",year:"1979"}], quote:"An empire is just a story a people tell about themselves until they stop believing it.", origin:"Rosario, Argentina" },
+  hao: { tag:"XIV · The Folder", nameEn:"Hao Jingfang", tags:["class & space","Hugo Award winner","folded realities"], bio:"An economist by training, Hao Jingfang folds Beijing into three layers — each invisible to the others — as a metaphor for China's class divides. She became the second Chinese author ever to win a Hugo.", birth:1984, death:null, coords:[116.4,39.9], works:[{title:"北京折叠 · Folding Beijing",year:"2012"},{title:"流浪苍穹 · Vagabonds",year:"2016"}], quote:"在折叠的城市里，我们每个人都活在别人看不见的时间里。", origin:"Beijing, China" },
+  xia: { tag:"XV · The Dreamer", nameEn:"Xia Jia", tags:["silkpunk","ecological grief","Chinese literary SF"], bio:"Xia Jia is a literature professor who writes SF about what modernity forgot. Her stories are lyrical and deeply concerned with the cost of progress — on landscapes, on memory, on the people whose lives don't fit inside a development plan.", birth:1984, death:null, coords:[108.9,34.3], works:[{title:"A Hundred Ghosts Parade Tonight",year:"2012"},{title:"Tongtong's Summer",year:"2014"}], quote:"Every ghost is a story that refused to end.", origin:"Xi'an, China" },
+  miyabe: { tag:"XVI · The Mirror", nameEn:"Miyuki Miyabe", tags:["social horror","Edo-period SF","Japan's conscience"], bio:"Miyabe writes about ordinary people destroyed by systems larger than themselves. Her SF and mystery novels are quiet, devastating indictments of Japanese social pressure — the salaryman culture, shame circulating through families for generations.", birth:1960, death:null, coords:[139.7,35.7], works:[{title:"All She Was Worth",year:"1992"},{title:"Brave Story",year:"2003"}], quote:"Evil is not dramatic. It is ordinary, and it is exhausted.", origin:"Tokyo, Japan" },
+  ueda: { tag:"XVII · The Deep Sea", nameEn:"Sayuri Ueda", tags:["biopunk","ocean futures","feminist body horror"], bio:"Ueda's The Cage of Zeus imagines a space station where humans are engineered with both sets of reproductive organs — and then asks what happens to social structures and identity when the body itself is redesigned.", birth:1964, death:null, coords:[135.5,34.7], works:[{title:"The Cage of Zeus",year:"2004"},{title:"Intrusion",year:"2012"}], quote:"We designed the body. We forgot to redesign what the body means.", origin:"Osaka, Japan" },
+  okofor: { tag:"XVIII · The Africanfuturist", nameEn:"Nnedi Okofor", tags:["Africanfuturism","Nigerian mythology","post-colonial SF"], bio:"Okofor coined the term Africanfuturism to distinguish her work from Afrofuturism — centering Africa itself, not the diaspora's relationship to Africa. Her fiction insists that the continent has its own futures and its own way of being modern.", birth:1974, death:null, coords:[3.4,6.5], works:[{title:"Who Fears Death",year:"2010"},{title:"Binti",year:"2015"}], quote:"Africa is not a place that needs saving. It is a place with stories that need telling.", origin:"Lagos, Nigeria" },
+  hopkinson: { tag:"XIX · The Griot", nameEn:"Nalo Hopkinson", tags:["Caribbean SF","creole futurism","folklore & technology"], bio:"Hopkinson writes Caribbean SF in a voice that switches between Standard English and Caribbean patois mid-sentence — because that's how her characters actually think. She insisted SF could sound like the whole world, not just one part of it.", birth:1960, death:null, coords:[-79.4,43.65], works:[{title:"Brown Girl in the Ring",year:"1998"},{title:"Midnight Robber",year:"2000"}], quote:"What is the past but the stories we choose to keep?", origin:"Toronto, Canada" },
+  chih: { tag:"XX · The New Voice", nameEn:"Chi Hui", tags:["hard SF","Galaxy Award","China's new wave"], bio:"Chi Hui is one of the most exciting voices in contemporary Chinese SF — writing hard science fiction about quantum physics and consciousness with a precision that reads like poetry. Her stories insist that rigorous science and emotional truth are not opposites.", birth:1983, death:null, coords:[104.1,30.6], works:[{title:"The Möbius Continuum",year:"2015"},{title:"Theory of Everything",year:"2018"}], quote:"At the edge of what we can measure, imagination is the only instrument.", origin:"Chengdu, China" },
+  saadawi: { tag:"XXI · The Architect of Cairo", nameEn:"Ahmed Saadawi", tags:["Arab gothic","war & monstrosity","Frankenstein in Baghdad"], bio:"Saadawi's Frankenstein in Baghdad assembles a creature from the body parts of bomb victims — a monster made entirely of collateral damage. It won the International Prize for Arabic Fiction.", birth:1973, death:null, coords:[44.4,33.3], works:[{title:"Frankenstein in Baghdad",year:"2013"},{title:"The President's Gardens",year:"2012"}], quote:"The city makes its own monsters from its own dead.", origin:"Baghdad, Iraq" },
+  oyeyemi: { tag:"XXII · The Fabulist", nameEn:"Helen Oyeyemi", tags:["fairy tale realism","Yoruba mythology","houses that think"], bio:"Oyeyemi writes houses that are malevolent, mirrors that lie, and fairy tales that refuse their endings. Her fiction moves between Nigeria, Europe, and somewhere genuinely uncategorizable.", birth:1984, death:null, coords:[-0.1,51.6], works:[{title:"White Is for Witching",year:"2009"},{title:"Boy, Snow, Bird",year:"2014"}], quote:"A house has a personality. You either get along with it or you don't.", origin:"London, United Kingdom" },
+  arnason: { tag:"XXIII · The Worldbuilder", nameEn:"Eleanor Arnason", tags:["Hwarhath SF","alien sociology","Minnesota realism"], bio:"Arnason invented the Hwarhath — a species that separated sex and violence so completely that war became male-only and desire entirely separate from reproduction. Then she wrote their literature, folklore, and history.", birth:1942, death:null, coords:[-93.3,44.9], works:[{title:"A Woman of the Iron People",year:"1991"},{title:"Ring of Swords",year:"1993"}], quote:"Imagine a world where violence and desire were kept in separate rooms.", origin:"Minnesota, United States" },
+  robson: { tag:"XXIV · The Posthuman", nameEn:"Justina Robson", tags:["posthuman bodies","nanotech","Yorkshire SF"], bio:"Robson's Natural History imagines a future where humans altered for space travel can no longer return to Earth — and asks what home means when your body has become the vessel. She writes posthumanism with genuine grief.", birth:1968, death:null, coords:[-1.5,53.8], works:[{title:"Natural History",year:"2003"},{title:"Keeping It Real",year:"2006"}], quote:"The body is the first country. Lose it, and you are stateless forever.", origin:"Yorkshire, United Kingdom" },
+  chaviano: { tag:"XXV · The Cuban", nameEn:"Daína Chaviano", tags:["Cuban SF","fantasy diaspora","erotic mythology"], bio:"Chaviano was the most important SF writer in Cuba before exile. In Miami, she kept writing — blending Afro-Cuban mythology, science fiction, and the longing of diaspora into novels that exist in a genre she essentially invented alone.", birth:1957, death:null, coords:[-82.4,23.1], works:[{title:"The Island of Eternal Love",year:"1998"},{title:"Fables of an Extraterrestrial Grandmother",year:"1988"}], quote:"Exile is not a place. It is a time that never ends.", origin:"Havana, Cuba" },
+  sinisalo: { tag:"XXVI · The Finn", nameEn:"Johanna Sinisalo", tags:["Finnish weird","troll ecology","Nordic noir SF"], bio:"Sinisalo's Troll: A Love Story treats trolls as a real, endangered species — then uses that premise to examine masculinity and the violence underneath Finnish social politeness. One of the strangest debut novels ever written.", birth:1958, death:null, coords:[25.7,62.2], works:[{title:"Troll: A Love Story",year:"2000"},{title:"The Core of the Sun",year:"2013"}], quote:"The wilderness is not empty. It is full of things that learned to hide from us.", origin:"Tampere, Finland" },
+  alnoman: { tag:"XXVII · The Gulf Voice", nameEn:"Nora Al-Noman", tags:["Arabic space opera","Gulf SF","first of her kind"], bio:"Al-Noman is the first Gulf Arab woman to write a science fiction novel in Arabic. Watan Samawi is an epic space opera set in a future where Arab civilization has reached the stars. She built an entire tradition where none existed.", birth:1974, death:null, coords:[55.3,25.2], works:[{title:"Watan Samawi",year:"2009"},{title:"Ajwan",year:"2012"}], quote:"We looked up at the same stars for centuries. I simply wrote us into them.", origin:"Dubai, UAE" },
+  yap: { tag:"XXVIII · The Filipino", nameEn:"Isabel Yap", tags:["Philippine mythology","horror & diaspora","aswang futures"], bio:"Yap writes horror from the Filipino diaspora's perspective — aswang and tikbalang appearing in Silicon Valley, duwende in suburban houses, the dread of assimilation encoded in monster stories.", birth:1990, death:null, coords:[121.0,14.6], works:[{title:"Never Have I Ever",year:"2021"},{title:"A Spell for Foolish Wishing",year:"2019"}], quote:"Every monster is homesick for something.", origin:"Manila, Philippines" },
+  hoffman: { tag:"XXIX · The Enchantress", nameEn:"Alice Hoffman", tags:["magical realism","New England gothic","botanical magic"], bio:"Hoffman has spent forty years writing American magical realism so consistent it constitutes its own cosmology. Her Practical Magic universe understands that magic is just another word for the things women pass down to each other.", birth:1952, death:null, coords:[-71.1,42.4], works:[{title:"Practical Magic",year:"1995"},{title:"The Rules of Magic",year:"2017"}], quote:"Magic is not what you do. It is what you are willing to believe.", origin:"Boston, United States" },
+  theodoridou: { tag:"XXX · The Greek", nameEn:"Natalia Theodoridou", tags:["mythpunk","Nebula winner","fragmented futures"], bio:"Theodoridou writes short fiction of devastating compression — stories that feel like entire novels in six pages. Her Nebula-winning work bends Greek myth, queerness, and grief into forms that don't exist in any other writer's work.", birth:1984, death:null, coords:[23.7,37.9], works:[{title:"The Eleven Holy Numbers of the Mechanical Soul",year:"2019"},{title:"In the Stillness Between the Stars",year:"2020"}], quote:"A myth is a wound that keeps the shape of the thing that made it.", origin:"Athens, Greece" },
+};
+
+const MIN_YEAR = 1800, MAX_YEAR = 2024;
+
+function ll2xyz(lat, lng, r) {
+  const phi = (90 - lat) * Math.PI / 180;
+  const theta = (lng + 180) * Math.PI / 180;
+  return [
+    -r * Math.sin(phi) * Math.cos(theta),
+     r * Math.cos(phi),
+     r * Math.sin(phi) * Math.sin(theta),
+  ];
+}
+
+/* 优化后的星点画布：柔和的紫色氤氲感 */
+function makeStarCanvas(size, active) {
+  const c = document.createElement("canvas");
+  c.width = size; c.height = size;
+  const ctx = c.getContext("2d");
+  const cx = size / 2;
+  const g = ctx.createRadialGradient(cx,cx,0,cx,cx,cx*0.9);
+  
+  if (active) {
+    g.addColorStop(0, "rgba(230, 215, 255, 0.95)");
+    g.addColorStop(0.15, "rgba(170, 130, 255, 0.5)");
+    g.addColorStop(0.4, "rgba(100, 60, 200, 0.15)");
+    g.addColorStop(1, "rgba(0, 0, 0, 0)");
+  } else {
+    g.addColorStop(0, "rgba(210, 200, 255, 0.7)");
+    g.addColorStop(0.25, "rgba(140, 120, 210, 0.15)");
+    g.addColorStop(1, "rgba(0, 0, 0, 0)");
+  }
+  
+  ctx.fillStyle = g;
+  ctx.fillRect(0,0,size,size);
+
+  if (active) {
+    ctx.strokeStyle = "rgba(220, 200, 255, 0.3)";
+    ctx.lineWidth = 0.8;
+    const l = cx * 0.75;
+    [[0,-1],[0,1],[-1,0],[1,0]].forEach(([dx,dy])=>{
+      ctx.beginPath(); ctx.moveTo(cx,cx); ctx.lineTo(cx+dx*l,cx+dy*l); ctx.stroke();
+    });
+  }
+  return c;
+}
+
+// Starfield
+const sf = document.getElementById("starfield");
+sf.setAttribute("width","100%"); sf.setAttribute("height","100%");
+const NS = "http://www.w3.org/2000/svg";
+for (let i=0;i<200;i++) {
+  const cx = (Math.sin(i*137.508)*0.5+0.5)*100;
+  const cy = (Math.sin(i*93.71)*0.5+0.5)*100;
+  const r = i%40===0?2.0:i%13===0?1.2:i%5===0?0.8:0.4;
+  const op = i%40===0?0.85:i%13===0?0.6:i%5===0?0.35:0.18;
+  const dur = 2.5+(i%5)*0.7;
+  const delay = (i*0.07).toFixed(2);
+  const fill = i%7===0?"rgba(200,175,255,1)":i%11===0?"rgba(255,240,220,1)":"white";
+  const c = document.createElementNS(NS,"circle");
+  c.setAttribute("cx",cx+"%"); c.setAttribute("cy",cy+"%"); c.setAttribute("r",r);
+  c.setAttribute("fill",fill);
+  c.style.animation = `twink ${dur}s ${delay}s ease-in-out infinite`;
+  c.style.opacity = op;
+  sf.appendChild(c);
+}
+
+// Panel logic
+let currentWriter = null;
+let currentTab = "profile";
+
+function openPanel(key) {
+  const w = WRITERS[key];
+  currentWriter = key;
+  currentTab = "profile";
+  document.getElementById("p-tag").textContent = w.tag;
+  document.getElementById("p-name").textContent = w.nameEn;
+  document.getElementById("p-tags").innerHTML = w.tags.map(t=>`<span class="tag">${t}</span>`).join("");
+  document.getElementById("p-bio").textContent = w.bio;
+  document.getElementById("p-origin").textContent = "✦ " + w.origin;
+  document.getElementById("p-dates").textContent = w.birth + " – " + (w.death || "present");
+  document.getElementById("p-works").innerHTML = w.works.map(wk=>`<div class="work-item"><div class="work-dot"></div><div><div class="work-title">${wk.title}</div><div class="work-year">${wk.year}</div></div></div>`).join("");
+  document.getElementById("p-quote").textContent = "\u201c" + w.quote + "\u201d";
+  const span = MAX_YEAR - MIN_YEAR;
+  const left = ((w.birth - MIN_YEAR) / span * 100).toFixed(1);
+  const width = (((w.death||2024) - w.birth) / span * 100).toFixed(1);
+  const bar = document.getElementById("p-bar");
+  bar.style.left = left+"%"; bar.style.width = "0%";
+  setTimeout(()=>{ bar.style.width = width+"%"; }, 100);
+  switchTab("profile");
+  document.getElementById("panel").classList.add("open");
+}
+
+function closePanel() {
+  document.getElementById("panel").classList.remove("open");
+  currentWriter = null;
+}
+
+function switchTab(tab) {
+  currentTab = tab;
+  document.querySelectorAll(".tab-btn").forEach(b=>b.classList.toggle("active", b.dataset.tab===tab));
+  document.querySelectorAll(".tab-content").forEach(c=>c.classList.toggle("active", c.id==="tab-"+tab));
+}
+
+document.getElementById("close-btn").addEventListener("click", closePanel);
+document.querySelectorAll(".tab-btn").forEach(b=>b.addEventListener("click",()=>switchTab(b.dataset.tab)));
+
+// Three.js globe
+async function loadScript(src) {
+  return new Promise(res=>{ const s=document.createElement("script"); s.src=src; s.onload=res; document.head.appendChild(s); });
+}
+
+async function init() {
+  await loadScript("https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js");
+  document.getElementById("status-text").textContent = "Reading the stars...";
+  const [worldData] = await Promise.all([
+    fetch("https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json").then(r=>r.json()),
+    loadScript("https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js"),
+  ]);
+  document.getElementById("status-text").textContent = "Drawing constellations...";
+  const THREE = window.THREE, topo = window.topojson;
+  const container = document.getElementById("mount");
+  const W = container.clientWidth, H = container.clientHeight;
+  const R = Math.min(W,H)*0.36;
+
+  const renderer = new THREE.WebGLRenderer({antialias:true,alpha:true});
+  renderer.setSize(W,H); renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+  container.appendChild(renderer.domElement);
+  renderer.domElement.style.cursor = "grab";
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(42,W/H,0.1,2000);
+  camera.position.set(0,0,R*2.85);
+  scene.add(new THREE.AmbientLight(0x221133,6));
+  const rim = new THREE.DirectionalLight(0xd0b0ff,1.2);
+  rim.position.set(-3,2,-4); scene.add(rim);
+
+  // Globe texture
+  const TEX=2048, tc=document.createElement("canvas");
+  tc.width=TEX; tc.height=TEX;
+  const ctx=tc.getContext("2d");
+  ctx.fillStyle="#03010a"; ctx.fillRect(0,0,TEX,TEX);
+  for(let i=0;i<8000;i++){ctx.fillStyle=`rgba(180,160,220,${Math.random()*0.05})`;ctx.fillRect(Math.random()*TEX,Math.random()*TEX,1,1);}
+  ctx.strokeStyle="rgba(210,185,255,0.06)"; ctx.lineWidth=1;
+  for(let lat=-90;lat<=90;lat+=15){const y=((90-lat)/180)*TEX;ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(TEX,y);ctx.stroke();}
+  for(let lng=-180;lng<=180;lng+=15){const x=((lng+180)/360)*TEX;ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,TEX);ctx.stroke();}
+  ctx.strokeStyle="rgba(210,185,255,0.14)"; ctx.lineWidth=2;
+  ctx.beginPath();ctx.moveTo(0,TEX/2);ctx.lineTo(TEX,TEX/2);ctx.stroke();
+
+  const countries=topo.feature(worldData,worldData.objects.countries);
+  function proj(lng,lat){return[((lng+180)/360)*TEX,((90-lat)/180)*TEX];}
+  function drawPoly(ring){
+    if(ring.length<2)return;
+    ctx.beginPath();
+    const[sx,sy]=proj(ring[0][0],ring[0][1]);ctx.moveTo(sx,sy);
+    for(let i=1;i<ring.length;i++){
+      if(Math.abs(ring[i][0]-ring[i-1][0])>180){const[px,py]=proj(ring[i][0],ring[i][1]);ctx.moveTo(px,py);}
+      else{const[px,py]=proj(ring[i][0],ring[i][1]);ctx.lineTo(px,py);}
+    }ctx.closePath();
+  }
+  ctx.fillStyle="rgba(45,18,72,0.22)";
+  countries.features.forEach(f=>{const ps=f.geometry.type==="Polygon"?[f.geometry.coordinates]:f.geometry.coordinates;ps.forEach(p=>p.forEach(r=>{drawPoly(r);ctx.fill();}));});
+  ctx.strokeStyle="rgba(200,175,255,0.18)"; ctx.lineWidth=1;
+  countries.features.forEach(f=>{const ps=f.geometry.type==="Polygon"?[f.geometry.coordinates]:f.geometry.coordinates;ps.forEach(p=>p.forEach(r=>{drawPoly(r);ctx.stroke();}));});
+
+  const globeTex=new THREE.CanvasTexture(tc);
+  const globe=new THREE.Mesh(new THREE.SphereGeometry(R,72,72),new THREE.MeshStandardMaterial({map:globeTex,roughness:0.95,metalness:0}));
+  scene.add(globe);
+  const halo1=new THREE.Mesh(new THREE.SphereGeometry(R*1.06,32,32),new THREE.MeshBasicMaterial({color:0x8030c0,transparent:true,opacity:0.09,side:THREE.FrontSide}));
+  scene.add(halo1);
+
+  const texBase=new THREE.CanvasTexture(makeStarCanvas(128,false));
+  const texActive=new THREE.CanvasTexture(makeStarCanvas(128,true));
+
+  const sprites={}, hits={}, basePosMap={};
+  Object.entries(WRITERS).forEach(([key,w])=>{
+    const[lng,lat]=w.coords;
+    const[bx,by,bz]=ll2xyz(lat,lng,1);
+    basePosMap[key]=new THREE.Vector3(bx,by,bz);
+    const[x,y,z]=ll2xyz(lat,lng,R*1.03);
+    const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:texBase,transparent:true,depthWrite:false,depthTest:false,opacity:1}));
+    sp.position.set(x,y,z); sp.scale.set(R*0.13,R*0.13,1); sp.userData={key}; sp.renderOrder=999;
+    scene.add(sp); sprites[key]=sp;
+    const hit=new THREE.Mesh(new THREE.SphereGeometry(R*0.09,6,6),new THREE.MeshBasicMaterial({visible:false}));
+    hit.position.set(x,y,z); hit.userData={key}; scene.add(hit); hits[key]=hit;
+  });
+  const hitList=Object.values(hits);
+
+  document.getElementById("status").style.display="none";
+
+  // State
+  let selectedKey=null, hoveredKey=null;
+  let dragging=false, prev={x:0,y:0}, downAt={x:0,y:0};
+
+  const xy=e=>e.touches?{x:e.touches[0].clientX,y:e.touches[0].clientY}:{x:e.clientX,y:e.clientY};
+  const ndc=(cx,cy)=>{const r=renderer.domElement.getBoundingClientRect();return{x:((cx-r.left)/r.width)*2-1,y:-((cy-r.top)/r.height)*2+1};};
+  const raycast=(mx,my)=>{const ray=new THREE.Raycaster();ray.setFromCamera({x:mx,y:my},camera);return ray.intersectObjects(hitList);};
+
+  renderer.domElement.addEventListener("mousedown",e=>{dragging=true;prev=xy(e);downAt={...prev};renderer.domElement.style.cursor="grabbing";});
+  window.addEventListener("mouseup",e=>{
+    dragging=false; renderer.domElement.style.cursor="grab";
+    const cur=xy(e);
+    if(Math.hypot(cur.x-downAt.x,cur.y-downAt.y)>5)return;
+    const{x,y}=ndc(cur.x,cur.y);
+    const h=raycast(x,y);
+    if(h.length){
+      const k=h[0].object.userData.key;
+      if(selectedKey===k){closePanel();selectedKey=null;}
+      else{selectedKey=k;openPanel(k);}
+    } else {closePanel();selectedKey=null;}
+  });
+
+  const tooltip=document.getElementById("tooltip");
+  renderer.domElement.addEventListener("mousemove",e=>{
+    const cur=xy(e);
+    if(dragging){
+      const dx=cur.x-prev.x,dy=cur.y-prev.y;
+      globe.rotation.y+=dx*0.006;
+      globe.rotation.x=Math.max(-Math.PI/2,Math.min(Math.PI/2,globe.rotation.x+dy*0.006));
+      prev=cur;
+    }
+    const{x,y}=ndc(cur.x,cur.y);
+    const h=raycast(x,y);
+    const hk=h.length?h[0].object.userData.key:null;
+    hoveredKey=hk;
+    if(hk&&!selectedKey){
+      const w=WRITERS[hk];
+      document.getElementById("tt-name").textContent=w.nameEn;
+      document.getElementById("tt-meta").textContent=w.birth+" – "+(w.death||"present")+" · "+w.origin;
+      tooltip.style.left=(cur.x+16)+"px";
+      tooltip.style.top=(cur.y-36)+"px";
+      tooltip.classList.add("show");
+    } else {tooltip.classList.remove("show");}
+    if(!dragging)renderer.domElement.style.cursor=hk?"pointer":"grab";
+  });
+
+  new ResizeObserver(()=>{
+    const W2=container.clientWidth,H2=container.clientHeight;
+    renderer.setSize(W2,H2);camera.aspect=W2/H2;camera.updateProjectionMatrix();
+  }).observe(container);
+
+  let t=0;
+  const quat=new THREE.Quaternion(),eu=new THREE.Euler();
+  function animate(){
+    requestAnimationFrame(animate); t+=0.016;
+    if(!dragging)globe.rotation.y+=0.001;
+    eu.copy(globe.rotation); quat.setFromEuler(eu);
+    const camDir=camera.position.clone().normalize();
+    Object.entries(sprites).forEach(([key,sp],i)=>{
+      const isActive=selectedKey===key||hoveredKey===key;
+      const worldPos=basePosMap[key].clone().applyQuaternion(quat).multiplyScalar(R*1.03);
+      sp.position.copy(worldPos); hits[key].position.copy(worldPos);
+      const dot=worldPos.clone().normalize().dot(camDir);
+      
+      // 优化遮挡逻辑
+      const vis = Math.max(0, Math.min(1, (dot + 0.15) / 0.3));
+      // 优雅的呼吸感
+      const pulse = 1 + Math.sin(t * 0.7 + i * 1.3) * 0.04;
+      // 激活态更克制的放大
+      const sz = R * (isActive ? 0.13 * pulse : 0.09 * pulse);
+      
+      sp.scale.set(sz,sz,1);
+      sp.material.map=isActive?texActive:texBase;
+      sp.material.opacity=vis;
+      sp.material.needsUpdate=true;
+    });
+    halo1.material.opacity=0.07+Math.sin(t*0.4)*0.02;
+    renderer.render(scene,camera);
+  }
+  animate();
+}
+
+init().catch(e=>{console.error(e);document.getElementById("status-text").textContent="Error — please refresh";});
+</script>
+</body>
+</html>
