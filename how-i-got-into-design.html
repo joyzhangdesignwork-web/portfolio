@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>How I started & what design means to me — Joy Zhang</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300;1,9..40,400&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --font-sans: "DM Sans", "Helvetica Neue", Arial, sans-serif;
+      --font-display: "Space Grotesk", "Helvetica Neue", Arial, sans-serif;
+      --bg: #ffffff;
+      --fg: #111111;
+      --muted: #5f5a52;
+      --line: #e5dfd4;
+      --panel: #f7f7f7;
+      --panel2: #efefef;
+      --accent: #fb5607;
+      --shadow: 0 18px 40px rgba(17, 17, 17, .12);
+      --radius: 12px;
+      --radius-lg: 16px;
+      --container: 680px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--font-sans);
+      background: var(--bg);
+      color: var(--fg);
+      font-size: 17px;
+      line-height: 1.6;
+      letter-spacing: 0.1px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* NAV */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--line);
+      padding: 0 32px;
+      height: 52px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .nav-logo {
+      font-family: var(--font-display);
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--fg);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .nav-logo::before {
+      content: '';
+      display: inline-block;
+      width: 7px;
+      height: 7px;
+      background: var(--accent);
+      border-radius: 50%;
+      animation: dotPulse 2s infinite;
+    }
+
+    @keyframes dotPulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    .nav-back {
+      font-size: 14px;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .nav-back:hover { color: var(--fg); }
+
+    /* MAIN */
+    main {
+      max-width: var(--container);
+      margin: 0 auto;
+      padding: 72px 24px 120px;
+    }
+
+    /* HEADER */
+    .post-eyebrow {
+      font-family: var(--font-display);
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--accent);
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+    }
+
+    .post-title {
+      font-family: var(--font-display);
+      font-size: clamp(28px, 5vw, 40px);
+      font-weight: 600;
+      line-height: 1.15;
+      letter-spacing: -0.5px;
+      margin-bottom: 24px;
+    }
+
+    .post-meta {
+      font-size: 14px;
+      color: var(--muted);
+      margin-bottom: 56px;
+      padding-bottom: 40px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    /* BODY */
+    .post-body {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .post-body p {
+      font-size: 17px;
+      line-height: 1.8;
+      color: var(--fg);
+      margin-bottom: 28px;
+    }
+
+    .post-body p.muted {
+      color: var(--muted);
+    }
+
+    /* Pull quote */
+    .pull-quote {
+      border-left: 3px solid var(--accent);
+      padding: 4px 0 4px 24px;
+      margin: 40px 0;
+    }
+
+    .pull-quote p {
+      font-family: var(--font-display);
+      font-size: 20px;
+      line-height: 1.5;
+      font-weight: 500;
+      color: var(--fg);
+      margin-bottom: 0 !important;
+    }
+
+    /* Section break */
+    .section-gap {
+      height: 48px;
+    }
+
+    /* Footer */
+    footer {
+      max-width: var(--container);
+      margin: 0 auto;
+      padding: 24px 24px 48px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid var(--line);
+    }
+
+    footer p { font-size: 13px; color: var(--muted); }
+    footer a { font-size: 13px; color: var(--muted); text-decoration: none; }
+    footer a:hover { color: var(--fg); }
+
+    @media (max-width: 640px) {
+      nav { padding: 0 20px; }
+      main { padding: 48px 20px 96px; }
+      .pull-quote p { font-size: 18px; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <a class="nav-logo" href="index.html">Joy Zhang</a>
+    <a class="nav-back" href="index.html">← Back</a>
+  </nav>
+
+  <main>
+    <p class="post-eyebrow">Origin Story</p>
+    <h1 class="post-title">How I started &amp; what design means to me</h1>
+    <p class="post-meta">By Joy Zhang &nbsp;·&nbsp; Toronto &nbsp;·&nbsp; <strong>3 min read</strong></p>
+
+    <div class="post-body">
+
+      <p>
+        I didn't start out wanting to be a designer. I started out wanting to fix something that felt wrong.
+      </p>
+
+      <p>
+        During undergrad (years back, I know), I came across a documentary about people living with spinal cord injuries. The film talked about the complete absence of any conversation around pleasure and intimacy for these people. The very human need to feel desired and to experience joy in your own body, and that stuck with me a lot.
+      </p>
+
+      <div class="pull-quote">
+        <p>"This is a real area of care. And nobody is designing for it."</p>
+      </div>
+
+      <p>
+        I didn't know what to do with that feeling at first. But I couldn't let it go. So I did the only thing I could think of: I reached out to people in Toronto's SCI community, with genuine curiosity and a willingness to listen. I wanted to understand their lives, not interpret them just from the outside.
+      </p>
+
+      <p>
+        Over several months, I built real relationships. I did research, I asked questions I wasn't sure I was allowed to ask, and people answered honestly because they could tell I was there to actually understand. What came out of it was a speculative hardware design — a concept exploring pleasure and intimacy for people with spinal cord injuries, grounded in everything I'd learned.
+      </p>
+
+      <p>
+        When I shared it with the people I'd worked with, their reaction stayed with me. They weren't moved because the design was technically impressive, but moved because someone had thought of that at all.
+      </p>
+
+      <div class="pull-quote">
+        <p>And that moment of joy from them kickstarted my journey to design.</p>
+      </div>
+
+      <p>
+        Design to me is beyond pretty screens. It has always been a way of saying: I saw you, I thought about you, I made something for you.
+      </p>
+
+      <div class="section-gap"></div>
+
+      <p>
+        I think about the field crews at Yeti Software too — people running lawn and snow care businesses from their phones, workers who didn't grow up with technology and didn't have time to figure it out. I think about how easy it is to design for yourself, for people who look like you and think like you and have the same relationship to tech that you do. And I think about what it actually takes to design for someone whose life is different from yours — the listening, the humility, the willingness to get it wrong a few times.
+      </p>
+
+      <p>
+        I think about the people using Pebble right now. People who are carrying things they haven't told anyone. Who reach for an app at 2am because they need somewhere safe to put what they're feeling. What those users need is evidence that someone understood them when they built this.
+      </p>
+
+      <div class="pull-quote">
+        <p>Design, to me, is the act of making someone feel seen — through the thing you built for them.</p>
+      </div>
+
+      <p>
+        I don't know if I'll always be a product designer by title. But I know I'll always be doing this: finding the people who get overlooked, trying to understand them well enough to make something that actually helps, and caring whether it works.
+      </p>
+
+      <p>
+        That documentary taught me what I want to spend my attention on. The craft just came naturally after that.
+      </p>
+
+    </div>
+  </main>
+
+  <footer>
+    <p>Joy Zhang · Product Designer · Toronto</p>
+    <a href="index.html">← Back to portfolio</a>
+  </footer>
+
+</body>
+</html>
